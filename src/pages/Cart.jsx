@@ -51,7 +51,7 @@ const Cart = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/order", {
+      const response = await fetch("https://book-wala-backend.vercel.app/order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -113,7 +113,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUser = async() => {
       try {
-        const res = await axios.get('http://localhost:3000/user/me', {
+        const res = await axios.get('https://book-wala-backend.vercel.app/user/me', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`
           },
@@ -132,7 +132,7 @@ const Profile = () => {
     const fetchOrders = async () => {
       setLoadingOrders(true);
       try {
-        const res = await axios.get("http://localhost:3000/order", {
+        const res = await axios.get("https://book-wala-backend.vercel.app/order", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`, 
           },

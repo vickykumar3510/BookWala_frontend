@@ -9,7 +9,7 @@ import WishlistContext from "../contexts/WishlistContext";
 const BookDetails = () => {
     const { cartItem, addToCart, increaseQuantity, decreaseQuantity } = useContext(CartContext);
     const { addToWishlist } = useContext(WishlistContext);
-    const { data, loading, error } = useFetch('http://localhost:3000/book');
+    const { data, loading, error } = useFetch('https://book-wala-backend.vercel.app/book');
     const { bookID } = useParams();
     const clickedBook = data?.find((b) => b._id === bookID);
 

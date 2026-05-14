@@ -22,7 +22,7 @@ const GENRES = [
 ];
 
 const Dashboard = () => {
-    const {data, loading, error} = useFetch('http://localhost:3000/book')
+    const {data, loading, error} = useFetch('https://book-wala-backend.vercel.app/book')
     const {cartItem, addToCart, increaseQuantity, decreaseQuantity} = useContext(CartContext)
     const [priceSort, setPriceSort] = useState('none')
     const [ratingFilter, setRatingFilter] = useState(['all'])
