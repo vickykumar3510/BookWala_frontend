@@ -10,8 +10,8 @@ Built with a React frontend, Express/Node backend, MongoDB databases.
 ## Quick Start
 
 ```
-git clone https://github.com/vickykumar3510/bookwala_frontend.git
-cd <bookwala_frontend>
+git clone https://github.com/vickykumar3510/BookWala_frontend.git
+cd <BookWala_frontend>
 npm install
 npm run dev
 ```
