@@ -7,15 +7,18 @@ import SearchContext from "../contexts/SearchContext"
 
 const Wishlist = () => {
     const {searchTerm, setSearchTerm} = useContext(SearchContext)
-    const {wishlistItem, setWishlistItem, removeFromWishlist, totalPriceWishlist} = useContext(WishlistContext)
+    const {wishlistItem, removeFromWishlist, totalPriceWishlist} = useContext(WishlistContext)
     const { addToCart } = useContext(CartContext)
 
     const search = searchTerm?.toLowerCase() || ""
 
-    const filteredWishlist = wishlistItem.filter((b) =>
-        b.bookAuthor.toLowerCase().includes(search) ||
-        b.bookName.toLowerCase().includes(search)
-    )
+    const matchesSearch = (b) => {
+        const author = String(b.bookAuthor ?? "").toLowerCase()
+        const title = String(b.bookName ?? "").toLowerCase()
+        return author.includes(search) || title.includes(search)
+    }
+
+    const filteredWishlist = wishlistItem.filter(matchesSearch)
     return (
         <>
         <Header />

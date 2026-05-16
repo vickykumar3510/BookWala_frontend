@@ -3,10 +3,13 @@ import { useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom"
 import { toast } from "react-toastify"
 import BookWalaLogo from "./components/BookWalaLogo.jsx"
+import { API_BASE_URL } from "./config/api.js"
+import { useAuth } from "./contexts/AuthContext.jsx"
 
 const App = () => {
   const [formData, setFormData] = useState({ userEmail: "", userPassword: "" })
   const navigate = useNavigate()
+  const { setToken } = useAuth()
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -15,7 +18,7 @@ const App = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const response = await fetch("https://book-wala-backend.vercel.app/auth/login", {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
@@ -23,7 +26,7 @@ const App = () => {
 
       const data = await response.json()
       if (response.ok) {
-        localStorage.setItem("token", data.token) 
+        setToken(data.token)
         toast.success("Login successful!")
         navigate("/dashboard") 
       } else {

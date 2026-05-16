@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import BookWalaLogo from "../components/BookWalaLogo.jsx"
 import { toast } from "react-toastify"
+import { API_BASE_URL } from "../config/api.js"
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -24,7 +25,7 @@ const SignUp = () => {
     }
     const payload = { ...formData, userPhoneNumber: phoneDigits }
     try {
-      const response = await fetch("https://book-wala-backend.vercel.app/auth/signUp", {
+      const response = await fetch(`${API_BASE_URL}/auth/signUp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)

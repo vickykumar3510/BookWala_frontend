@@ -5,21 +5,21 @@ import CartContext from "../contexts/CartContext"
 import WishlistContext from "../contexts/WishlistContext"
 import { toast } from "react-toastify"
 import BookWalaLogo from "./BookWalaLogo"
+import { useAuth } from "../contexts/AuthContext.jsx"
 
 const Header = () => {
     const { setSearchTerm } = useContext(SearchContext)
     const {cartItem} = useContext(CartContext)
     const {wishlistItem} = useContext(WishlistContext)
+    const { setToken } = useAuth()
 
     const handleInput = (e) => {
         setSearchTerm(e.target.value)
     }
 
     const handleLogout = () => {
-        localStorage.removeItem("token")
-        localStorage.removeItem("authToken")
-        toast.success("Logout Successfully.");
-        window.location.replace("/");
+        toast.success("Logout Successfully.", { toastId: "logout-success" })
+        setToken(null)
     }
     return (
         <header className="site-header">

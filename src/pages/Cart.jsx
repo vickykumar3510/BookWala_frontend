@@ -1,32 +1,74 @@
-import CartContext from "../contexts/CartContext"
-import { useContext, useState } from "react"
+import CartContext from "../contexts/CartContext.jsx"
+import { useContext, useEffect, useState } from "react"
 import Header from "../components/Header"
 import Footer from "../components/Footer"
 import WishlistContext from "../contexts/WishlistContext"
 import SearchContext from "../contexts/SearchContext"
 import AddressContext from "../contexts/AddressContext"
 import { useNavigate } from "react-router-dom"
+import { API_BASE_URL } from "../config/api.js"
+import { useAuth } from "../contexts/AuthContext.jsx"
 
 
 const Cart = () => {
-  const { savedAddress } = useContext(AddressContext)
+  const { savedAddress, selectedAddressId, selectAddress } = useContext(AddressContext)
   const { searchTerm } = useContext(SearchContext)
   const { clearCart, cartItem, increaseQuantity, decreaseQuantity, removeFromCart, totalPriceCart } = useContext(CartContext)
   const { addToWishlist } = useContext(WishlistContext)
   const navigate = useNavigate()
+  const { token } = useAuth()
+  const [profilePhone, setProfilePhone] = useState("")
 
-  const [selectedAddress, setSelectedAddress] = useState("")
+  useEffect(() => {
+    if (!token) {
+      setProfilePhone("")
+      return
+    }
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/user/me`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) return
+        const me = await res.json()
+        if (!cancelled && me?.userPhoneNumber != null) {
+          setProfilePhone(String(me.userPhoneNumber))
+        }
+      } catch {
+        /* ignore */
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [token])
 
   const search = searchTerm?.toLowerCase() || ""
-  const filteredCartList = cartItem.filter((b) =>
-    b.bookAuthor.toLowerCase().includes(search) ||
-    b.bookName.toLowerCase().includes(search)
-  )
+  const matchesSearch = (b) => {
+    const author = String(b.bookAuthor ?? "").toLowerCase()
+    const title = String(b.bookName ?? "").toLowerCase()
+    return author.includes(search) || title.includes(search)
+  }
+  const filteredCartList = cartItem.filter(matchesSearch)
 
   const totalBooks = cartItem.reduce((acc, item) => acc + item.quantity, 0)
 
+  const canProceedToCheckout =
+    Boolean(selectedAddressId) && cartItem.length > 0 && totalBooks > 0
+
   const handleProceedToCheckout = async () => {
-    const addr = savedAddress.find(a => a.nickname === selectedAddress)
+    if (!cartItem.length || totalBooks <= 0) {
+      alert("Your cart is empty. Add books before checkout.")
+      return
+    }
+    const addr = savedAddress.find((a) => a._id === selectedAddressId)
+    if (!addr) return
+
+    const phone =
+      String(addr.customerPhone ?? "").replace(/\D/g, "").length === 10
+        ? String(addr.customerPhone).replace(/\D/g, "")
+        : String(profilePhone ?? "").replace(/\D/g, "")
 
     const orderData = {
       customerName: addr.nickname,
@@ -38,7 +80,7 @@ const Cart = () => {
         state: addr.state,
         pincode: Number(addr.pincode)
       },
-      customerPhone: addr.customerPhone,
+      customerPhone: phone,
       totalBooks,
       totalPrice: totalPriceCart,
       items: cartItem.map((b) => ({
@@ -51,11 +93,11 @@ const Cart = () => {
     }
 
     try {
-      const response = await fetch("https://book-wala-backend.vercel.app/order", {
+      const response = await fetch(`${API_BASE_URL}/order`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify(orderData)
       })
@@ -65,8 +107,8 @@ const Cart = () => {
         clearCart()
         navigate("/checkout", { state: { order: data } })
       } else {
-        const err = await response.json()
-        alert("Error placing order: " + err.message)
+        const err = await response.json().catch(() => ({}))
+        alert("Error placing order: " + (err.message || err.error || response.statusText))
       }
     } catch (error) {
       console.error("Error:", error)
@@ -87,7 +129,7 @@ const Cart = () => {
           <h2 className="cart__summary-title">Cart Summary</h2>
           <div className="cart__summary-stats">
             <p className="cart__summary-line">Total Number of Books: {totalBooks}</p>
-            <p className="cart__summary-line">Total Amount: Rs. {totalPriceCart}</p>
+            <p className="cart__summary-line">Total Price: Rs. {totalPriceCart}</p>
           </div>
 
           <label htmlFor="address" className="cart__label">Please select a delivery address:</label>
@@ -95,13 +137,13 @@ const Cart = () => {
             name="address"
             id="address"
             className="cart__select"
-            value={selectedAddress}
-            onChange={(e) => setSelectedAddress(e.target.value)}
+            value={selectedAddressId ?? ""}
+            onChange={(e) => selectAddress(e.target.value || null)}
           >
             <option value="">Select Address</option>
             {savedAddress && savedAddress.length > 0 ? (
-              savedAddress.map((addr, idx) => (
-                <option key={idx} value={addr.nickname}>
+              savedAddress.map((addr) => (
+                <option key={addr._id} value={addr._id}>
                   {`${addr.nickname} - ${addr.flat}, ${addr.area}, ${addr.city}, ${addr.state}, ${addr.pincode}${addr.customerPhone != null && String(addr.customerPhone).trim() !== "" ? `, ${addr.customerPhone}` : ""}`}
                 </option>
               ))
@@ -121,7 +163,7 @@ const Cart = () => {
             <button
               type="button"
               className="cart__btn cart__btn--primary"
-              disabled={!selectedAddress}
+              disabled={!canProceedToCheckout}
               onClick={handleProceedToCheckout}
             >
               Proceed to Checkout

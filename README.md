@@ -1,11 +1,10 @@
 # BookWala
 
-A full-stack book shopping app where you can search any book, read about the book, buy book and add book to the cart for buy later.
-Built with a React frontend, Express/Node backend, MongoDB databases.
+A full‑stack book shopping application where users can create accounts, log in securely, search any book, read about the book, buy book and add book to the wishlist to buy later. Built with a React frontend, Express/Node backend, MongoDB databases.
 
 ## Demo Link
 
-[Live Demo](https://bookwala-app.vercel.app/)
+[Live Demo](https://bookwala-tool.vercel.app)
 
 ## Quick Start
 
@@ -28,90 +27,158 @@ npm run dev
 Watch a walkthrough of all the major features of this app: [Google Drive Link]()
 
 ## Features
-**Home**
-- Featured books and filter button for get all the books by Genre
-- Search bar where you can search book by Title, Author and Genre
+**Login**
+- User login form with email and password fields
+- Incorrect password alerts shown
+- Successful login redirects to dashboard
 
-**All Books**
-- Display all the books with "Add to Cart" and "Add to Wishlist" button
-- Add filters:- Sort by price, filter by genre, filter by rating
+**Sign Up**
+- User account creation form provided
+- Success alert shown on account creation
+- Navigation link back to Sign‑In page
+- Input validation ensures phone number must be exactly 10 digits
 
-**Pofile**
-- User information
-- Order history regarding to purchased date
-- Add and Edit address
+**Dashboard**
+- Displays list of books with navigation to book details
+- Filtering options: book name, author, genre, ratings
+- Sorting by price (low to high / high to low)
+- Add books to cart or wishlist directly from dashboard
+
+**Book Detail**
+- Displays complete information about the selected book: author, genre, description, rating, and price
+- Provides Add to Cart button for immediate purchase intent
+- Provides Add to Wishlist button for saving books to wishlist
+
+**Profile**
+- Displays signed‑in user’s name, email, and phone number
+- Add/Edit address form available
+- Address cannot be saved unless phone number is 10 digits
+- Displays all orders sorted by latest order first
 
 **Wishlist**
-- Showing Total Wishlist Items
-- Added books with "Add to Cart" and "Remove" button
+- Displays all books added to wishlist
+- Options to Add to Cart or Remove from wishlist
+- Search bar to find books within wishlist
 
 **Cart**
-- Showing Total Items in the Cart
-- Showing Total Number of books and Total Amount
-- Cannot proceed to checkout without selecting the address
-- A button is also there for adding new address
+- Displays all books added to cart
+- Options to Add to Wishlist, Remove, or adjust Quantity
+- Search bar to find books within cart
+- User cannot place order until a delivery address is selected
+- Navigation link to address form available
+- Shows total cart summary (books + price)
 
-**Book Details**
-- Image, Rating, Price, Genre of the book
-- "Add to Cart" and "Add to Wishlist" button
-- Description about the book
+**Checkout**
+- Displays all ordered books with details
+- Shows selected delivery address and book information
+- Cart is cleared once order is placed
 
 ##API Reference
 --
-**GET/api/books**<br>
-List of all the books<br>
+
+**POST /api/auth/signup**<br>
+Register new user<br>
 
 Sample Response:
 ```
-[{_id, bookAuthor, bookName, bookImage, bookPrice, bookDescription, bookRating, bookGenre, createdAt, updatedAt, __v}]
+{ message }
 ```
 
-**GET/api/books/bookGenre/:byGenre**<br>
-List of all the books by Genre<br>
+**POST /api/auth/login**<br>
+Login user<br>
 
 Sample Response:
-
 ```
-[{_id, bookAuthor, bookName, bookImage, bookPrice, bookDescription, bookRating, bookGenre, createdAt, updatedAt, __v
-}]
+{ message, token }
 ```
 
-**GET/api/books/bookRating/:byRating**<br>
-List of all the books by Rating<br>
+**GET /api/auth/me**<br>
+Get authenticated user details<br>
 
 Sample Response:
-
 ```
-[{_id, bookAuthor, bookName, bookImage, bookPrice, bookDescription, bookRating, bookGenre, createdAt, updatedAt, __v
-}]
+{ user: { _id, name, email } }
 ```
 
-**GET/api/books/bookPrice/:byPrice**<br>
-List of all the books by Price<br>
+**GET /api/book**<br>
+List all books<br>
 
 Sample Response:
-
 ```
-[{_id, bookAuthor, bookName, bookImage, bookPrice, bookDescription, bookRating, bookGenre, createdAt, updatedAt, __v
-}]
+[{ _id, title, author, genre, status, createdAt, updatedAt }]
 ```
 
-**GET/api/books/bookName/:byName**<br>
-List of all the books by Book Name<br>
+**POST /api/book**<br>
+Add new book<br>
 
 Sample Response:
-
 ```
-[{_id, bookAuthor, bookName, bookImage, bookPrice, bookDescription, bookRating, bookGenre, createdAt, updatedAt, __v
-}]
-```
-**POST/api/place-order**<br>
-For save the book orders<br>
-```
-[{orderDateTime, _id, items, createdAt, updatedAt, __v
-}]
+{ _id, title, author, genre, status, createdAt, updatedAt }
 ```
 
+**PUT /api/book/:id**<br>
+Update any book<br>
+
+Sample Response:
+```
+{ _id, title, author, genre, status, createdAt, updatedAt }
+```
+
+**GET /api/book/Genre/:byGenre**<br>
+List all books<br>
+
+Sample Response:
+```
+[{ _id, title, author, genre, status, createdAt, updatedAt }]
+```
+
+**GET /api/book/Genre/:byBookName**<br>
+List all books<br>
+
+Sample Response:
+```
+[{ _id, title, author, genre, status, createdAt, updatedAt }]
+```
+
+**GET /api/book/Genre/:byAuthor**<br>
+List all books<br>
+
+Sample Response:
+```
+[{ _id, title, author, genre, status, createdAt, updatedAt }]
+```
+
+**GET /api/book/Genre/:byRating**<br>
+List all books<br>
+
+Sample Response:
+```
+[{ _id, title, author, genre, status, createdAt, updatedAt }]
+```
+
+**GET /api/user**<br>
+List all users<br>
+
+Sample Response:
+```
+{ user: { _id, name, email } }
+```
+
+**GET /api/order**<br>
+List all ordered books<br>
+
+Sample Response:
+```
+[{ _id, title, author, genre, status, createdAt, updatedAt }]
+```
+
+**POST /api/book**<br>
+Place order of book<br>
+
+Sample Response:
+```
+[{ _id, title, author, genre, status, createdAt, updatedAt }]
+```
 ##Contact 
 --
 For bugs or feature requests, please reach out to vicky.kumar3510@gmail.com

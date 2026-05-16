@@ -6,6 +6,7 @@ import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import CartContext from "../contexts/CartContext";
 import WishlistContext from "../contexts/WishlistContext";
+import { API_BASE_URL } from "../config/api.js";
 
 const GENRES = [
   { label: "All Genre", value: "" },
@@ -22,7 +23,7 @@ const GENRES = [
 ];
 
 const Dashboard = () => {
-    const {data, loading, error} = useFetch('https://book-wala-backend.vercel.app/book')
+    const {data, loading, error} = useFetch(`${API_BASE_URL}/book`)
     const {cartItem, addToCart, increaseQuantity, decreaseQuantity} = useContext(CartContext)
     const [priceSort, setPriceSort] = useState('none')
     const [ratingFilter, setRatingFilter] = useState(['all'])

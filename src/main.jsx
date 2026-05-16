@@ -15,6 +15,7 @@ import { CartProvider } from './contexts/CartContext.jsx'
 import { WishlistProvider } from './contexts/WishlistContext.jsx'
 import Checkout from './pages/Checkout.jsx'
 import { AddressProvider } from './contexts/AddressContext.jsx'
+import { AuthProvider } from './contexts/AuthContext.jsx'
 import ProtectedRoute from './components/ProtectedRoute.jsx'
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -40,6 +41,7 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+    <AuthProvider>
     <AddressProvider>
     <WishlistProvider>
     <CartProvider>
@@ -62,5 +64,6 @@ createRoot(document.getElementById('root')).render(
     </CartProvider>
     </WishlistProvider>
     </AddressProvider>
+    </AuthProvider>
   </StrictMode>,
 )

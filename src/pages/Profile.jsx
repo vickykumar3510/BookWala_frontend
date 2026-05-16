@@ -4,6 +4,8 @@ import AddressContext from "../contexts/AddressContext";
 import { useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { API_BASE_URL } from "../config/api.js";
+import { useAuth } from "../contexts/AuthContext.jsx";
 
 const ORDER_MONTHS = [
   "January",
@@ -39,11 +41,12 @@ function formatOrderedOn(value) {
 }
 
 const Profile = () => {
+  const { token } = useAuth();
   const {
     addAddress,
     selectAddress,
     savedAddress,
-    selectedAddress,
+    selectedAddressId,
     deleteAddress,
     updateAddress,
   } = useContext(AddressContext);
@@ -56,7 +59,7 @@ const Profile = () => {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [phone, setPhone] = useState("")
-  const [editAddress, setEditAddress] = useState(null);
+  const [editAddressId, setEditAddressId] = useState(null);
 
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
@@ -73,10 +76,10 @@ const Profile = () => {
     setCity("");
     setState("");
     setPhone("")
-    setEditAddress(null);
+    setEditAddressId(null);
   };
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
 
     if (!nickname || !flat || !area || !landmark || !pincode || !city || !state || !phone) {
@@ -101,56 +104,70 @@ const Profile = () => {
       customerPhone: phoneDigits,
     };
 
-    if (editAddress !== null) {
-      updateAddress(editAddress, newAddress);
+    if (editAddressId) {
+      await updateAddress(editAddressId, newAddress);
     } else {
-      addAddress(newAddress);
+      await addAddress(newAddress);
     }
 
     resetForm();
   };
 
   useEffect(() => {
-    const fetchUser = async() => {
-      try {
-        const res = await axios.get('https://book-wala-backend.vercel.app/user/me', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          },
-        })
-        setUser(res.data)
-      }catch(error){
-        console.error('Failed to fetch user', error)
-      }
+    if (!token) {
+      setUser(null);
+      return;
     }
-    fetchUser()
-  }, [])
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_URL}/user/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUser(res.data);
+      } catch (error) {
+        console.error("Failed to fetch user", error);
+      }
+    };
+    fetchUser();
+  }, [token]);
 
   
 
   useEffect(() => {
+    if (!token) {
+      setOrders([]);
+      setErrorOrders(null);
+      return;
+    }
     const fetchOrders = async () => {
       setLoadingOrders(true);
       try {
-        const res = await axios.get("https://book-wala-backend.vercel.app/order", {
+        const res = await axios.get(`${API_BASE_URL}/order`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, 
+            Authorization: `Bearer ${token}`,
           },
         });
-   
-        const sortedOrders = res.data.sort(
-          (a, b) => new Date(b.orderDateTime) - new Date(a.orderDateTime)
+
+        const list = Array.isArray(res.data) ? res.data : [];
+        const sortedOrders = [...list].sort(
+          (a, b) =>
+            new Date(b.orderDateTime ?? b.createdAt) -
+            new Date(a.orderDateTime ?? a.createdAt)
         );
         setOrders(sortedOrders);
       } catch (error) {
-        setErrorOrders(error.response?.data?.message || "Failed to fetch orders");
+        setErrorOrders(
+          error.response?.data?.message || "Failed to fetch orders"
+        );
       } finally {
         setLoadingOrders(false);
       }
     };
 
     fetchOrders();
-  }, []);
+  }, [token]);
 
   return (
     <>
@@ -241,7 +258,7 @@ const Profile = () => {
           <br />
 
           <button type="submit" className="profile__btn profile__btn--primary">
-            {editAddress !== null ? "Update Address" : "Add Address"}
+            {editAddressId ? "Update Address" : "Add Address"}
           </button>
         </form>
 
@@ -251,13 +268,13 @@ const Profile = () => {
             <p className="profile__empty">No addresses saved yet.</p>
           ) : (
             <form className="profile__address-form">
-              {savedAddress.map((addr, i) => (
-                <div key={i} className="profile__address-row">
+              {savedAddress.map((addr) => (
+                <div key={addr._id} className="profile__address-row">
                   <input
                     type="radio"
                     name="selectedAddress"
-                    checked={selectedAddress === i}
-                    onChange={() => selectAddress(i)}
+                    checked={selectedAddressId === addr._id}
+                    onChange={() => selectAddress(addr._id)}
                   />
                   <label>
                     <strong>{addr.nickname}</strong> - {addr.flat}, {addr.area},{" "}
@@ -269,7 +286,7 @@ const Profile = () => {
                       type="button"
                       className="profile__btn profile__btn--secondary"
                       onClick={() => {
-                        setEditAddress(i);
+                        setEditAddressId(addr._id);
                         setNickname(addr.nickname);
                         setFlat(addr.flat);
                         setArea(addr.area);
@@ -277,7 +294,9 @@ const Profile = () => {
                         setPincode(addr.pincode);
                         setCity(addr.city);
                         setState(addr.state);
-                        setPhone(addr.customerPhone)
+                        const savedPhone = addr.customerPhone != null ? String(addr.customerPhone).trim() : "";
+                        const accountPhone = user?.userPhoneNumber != null ? String(user.userPhoneNumber).trim() : "";
+                        setPhone(savedPhone || accountPhone);
                       }}
                     >
                       Edit
@@ -287,7 +306,7 @@ const Profile = () => {
                       type="button"
                       className="profile__btn profile__btn--danger"
                       onClick={() => {
-                        deleteAddress(i);
+                        void deleteAddress(addr._id);
                         resetForm();
                       }}
                     >
@@ -310,7 +329,9 @@ const Profile = () => {
             <ul className="profile__order-list">
               {orders.map((order, i) => (
                 <li key={order._id || i} className="profile__order">
-                  <strong>{formatOrderedOn(order.orderDateTime ?? order.createdAt)}</strong>
+                  <strong className="profile__order-datetime">
+                    {formatOrderedOn(order.orderDateTime ?? order.createdAt)}
+                  </strong>
                   <br />
                   Customer: {order.customerName} <br />
                   Address: {order.customerAddress.flat}, {order.customerAddress.area}, {order.customerAddress.landmark}, {order.customerAddress.city}, {order.customerAddress.state}, {order.customerAddress.pincode} <br />
