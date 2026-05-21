@@ -5,7 +5,6 @@ import { useAuth } from "./AuthContext.jsx"
 
 const toastGuard = new Set()
 
-/** One toast per user action; blocks duplicate calls in the same tick (e.g. Strict Mode). */
 function toastOnce(actionKey, show) {
   if (toastGuard.has(actionKey)) return
   toastGuard.add(actionKey)

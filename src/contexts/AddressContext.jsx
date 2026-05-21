@@ -6,12 +6,14 @@ import { useAuth } from "./AuthContext.jsx"
 const AddressContext = createContext()
 
 const toApiAddressBody = (addr) => ({
+  nickname: addr.nickname,
   flat: addr.flat,
   area: addr.area,
   landmark: addr.landmark,
   city: addr.city,
   state: addr.state,
   pincode: addr.pincode,
+  customerPhone: addr.customerPhone
 })
 
 const mapServerAddress = (a) => ({
@@ -128,7 +130,6 @@ export const AddressProvider = ({ children }) => {
     }
   }
 
-  /** Backend has no PUT; replace by delete + create. */
   const updateAddress = async (addressId, updatedAddress) => {
     if (!token || !addressId) return
     try {
