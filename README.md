@@ -40,7 +40,7 @@ Watch a walkthrough of all the major features of this app: [Google Drive Link](h
 
 **Dashboard**
 - Displays list of books with navigation to book details
-- Filtering options: book name, author, genre, ratings
+- Filtering options:- book name, author, genre, ratings
 - Sorting by price (low to high / high to low)
 - Add books to cart or wishlist directly from dashboard
 
