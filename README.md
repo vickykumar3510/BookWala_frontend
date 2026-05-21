@@ -24,7 +24,7 @@ npm run dev
 - bcryptjs
 
 ## Demo Video
-Watch a walkthrough of all the major features of this app: [Google Drive Link]()
+Watch a walkthrough of all the major features of this app: [Google Drive Link](https://drive.google.com/file/d/1n6cYrjxoyaHD991tsR7Pbms8akUhiFUB/view?usp=sharing)
 
 ## Features
 **Login**
