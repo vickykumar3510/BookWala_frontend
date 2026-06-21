@@ -6,7 +6,7 @@ const BookWalaLogo = ({ variant = "header", to }) => {
   const markClass = isAuth ? "auth__logo-mark" : "site-header__logo-mark"
   const svgClass = isAuth ? "auth__logo-svg" : "site-header__logo-svg"
   const textClass = isAuth ? "auth__logo-text" : "site-header__logo-text"
-  const href = to ?? (isAuth ? "/" : "/dashboard")
+  const href = to ?? (isAuth ? "/" : "/home")
 
   return (
     <Link to={href} className={linkClass} aria-label="BookWala — home">

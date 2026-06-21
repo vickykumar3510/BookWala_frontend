@@ -1,4 +1,4 @@
-import HeaderNoSearchBar from "../components/HeadeNoSearchBar";
+import HeaderNoSearchBar from "../components/HeaderNoSearchBar";
 import Footer from "../components/Footer";
 import { useParams } from "react-router-dom";
 import useFetch from "../../useFetch";

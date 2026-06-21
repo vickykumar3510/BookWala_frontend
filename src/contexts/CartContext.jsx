@@ -3,15 +3,7 @@ import { toast } from "react-toastify"
 import { API_BASE_URL } from "../config/api.js"
 import { useAuth } from "./AuthContext.jsx"
 
-const toastGuard = new Set()
-
-function toastOnce(actionKey, show) {
-  if (toastGuard.has(actionKey)) return
-  toastGuard.add(actionKey)
-  const toastId = `${actionKey}-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
-  show(toastId)
-  queueMicrotask(() => toastGuard.delete(actionKey))
-}
+const CartContext = createContext()
 
 function toFiniteNumber(value) {
   if (value == null || value === "") return null
@@ -73,8 +65,6 @@ function itemLineTotal(item) {
   if (!Number.isFinite(price)) return 0
   return price * (Number.isFinite(qty) && qty > 0 ? qty : 1)
 }
-
-const CartContext = createContext()
 
 async function putCartOnServer(token, cart) {
   const res = await fetch(`${API_BASE_URL}/user/me/cart`, {
@@ -143,22 +133,18 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (book) => {
     if (!token) {
-      toast.error("Please log in to use the cart.")
+      toast.error("Please log in to use the cart.", { toastId: "cart-login-required" })
       return
     }
     setCartItem((prev) => {
       const existing = prev.find((b) => b._id === book._id)
       if (existing) {
-        toastOnce(`cart-already-in-cart-${book._id}`, (toastId) =>
-          toast.info("Book already in cart.", { toastId })
-        )
+        toast.info("Book already in cart.", { toastId: "cart-already-in-cart" })
         return prev
       }
       const next = [...prev, { ...book, quantity: 1 }]
       void persistCart(next)
-      toastOnce(`cart-book-added-${book._id}-${prev.length}`, (toastId) =>
-        toast.success("Book added to cart!", { toastId })
-      )
+      toast.success("Book added to cart!", { toastId: "cart-book-added" })
       return next
     })
   }
@@ -170,10 +156,7 @@ export const CartProvider = ({ children }) => {
         b._id === bookId ? { ...b, quantity: b.quantity + 1 } : b
       )
       void persistCart(next)
-      toastOnce(
-        `cart-qty-increased-${bookId}-${prev.find((b) => b._id === bookId)?.quantity ?? 0}`,
-        (toastId) => toast.success("Quantity increased.", { toastId })
-      )
+      toast.success("Quantity increased.", { toastId: "cart-qty-increased" })
       return next
     })
   }
@@ -187,10 +170,7 @@ export const CartProvider = ({ children }) => {
         )
         .filter((b) => b.quantity > 0)
       void persistCart(next)
-      toastOnce(
-        `cart-qty-decreased-${bookId}-${prev.find((b) => b._id === bookId)?.quantity ?? 0}`,
-        (toastId) => toast.info("Quantity decreased.", { toastId })
-      )
+      toast.info("Quantity decreased.", { toastId: "cart-qty-decreased" })
       return next
     })
   }
@@ -200,9 +180,7 @@ export const CartProvider = ({ children }) => {
     setCartItem((prev) => {
       const next = prev.filter((b) => b._id !== book._id)
       void persistCart(next)
-      toastOnce(`cart-book-removed-${book._id}-${prev.length}`, (toastId) =>
-        toast.error("Book removed from cart.", { toastId })
-      )
+      toast.error("Book removed from cart.", { toastId: "cart-book-removed" })
       return next
     })
   }

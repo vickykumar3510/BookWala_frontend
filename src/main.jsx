@@ -6,6 +6,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import App from './App.jsx'
 import BookDetails from './pages/BookDetails.jsx'
 import Dashboard from './pages/Dashboard.jsx'
+import Landing from './pages/Landing.jsx'
 import Wishlist from './pages/Wishlist.jsx'
 import Profile from './pages/Profile.jsx'
 import Cart from './pages/Cart.jsx'
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       { path: '/bookdetail/:bookID', element: <BookDetails /> },
+      { path: '/home', element: <Landing /> },
       { path: '/dashboard', element: <Dashboard /> },
       { path: '/profile', element: <Profile /> },
       { path: '/cart', element: <Cart /> },
@@ -49,8 +51,9 @@ createRoot(document.getElementById('root')).render(
     <ToastHeaderInsetSync />
     <RouterProvider router={router}/>
     <ToastContainer 
-              position="top-right" 
-              autoClose={3000} 
+              position="top-right"
+              limit={2}
+              autoClose={2000} 
               hideProgressBar={false} 
               newestOnTop={false} 
               closeOnClick 

@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom"
-import CartContext from "../contexts/CartContext"
-import WishlistContext from "../contexts/WishlistContext"
+import CartContext from "../contexts/CartContext.jsx"
+import WishlistContext from "../contexts/WishlistContext.jsx"
 import { useContext } from "react"
 import { toast } from "react-toastify"
-import BookWalaLogo from "./BookWalaLogo"
+import BookWalaLogo from "./BookWalaLogo.jsx"
 import { useAuth } from "../contexts/AuthContext.jsx"
 
 const HeaderNoSearchBar = () => {

@@ -1,10 +1,12 @@
 import { useState } from "react"
+import {useNavigate} from "react-router-dom"
 import { Link } from "react-router-dom"
 import BookWalaLogo from "../components/BookWalaLogo.jsx"
 import { toast } from "react-toastify"
 import { API_BASE_URL } from "../config/api.js"
 
 const SignUp = () => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     userName: "",
     userEmail: "",
@@ -34,8 +36,9 @@ const SignUp = () => {
       const data = await response.json()
       if (response.ok) {
         toast.success("User registered successfully!")
+        navigate("/")
       } else {
-        alert(data.error || "Error registering user")
+        toast.error(data.error || "Error registering user")
       }
     } catch (error) {
       console.error(error)

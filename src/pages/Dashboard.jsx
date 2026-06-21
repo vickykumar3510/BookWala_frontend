@@ -2,8 +2,8 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import useFetch from "../../useFetch";
 import SearchContext from "../contexts/SearchContext";
-import { useContext, useState } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import CartContext from "../contexts/CartContext";
 import WishlistContext from "../contexts/WishlistContext";
 import { API_BASE_URL } from "../config/api.js";
@@ -22,25 +22,38 @@ const GENRES = [
   { label: "Children", value: "Children" },
 ];
 
+const CATEGORIES = GENRES.filter(({ value }) => value !== "");
+
 const Dashboard = () => {
+    const [searchParams] = useSearchParams()
     const {data, loading, error} = useFetch(`${API_BASE_URL}/book`)
-    const {cartItem, addToCart, increaseQuantity, decreaseQuantity} = useContext(CartContext)
+    const {cartItem, addToCart} = useContext(CartContext)
     const [priceSort, setPriceSort] = useState('none')
     const [ratingFilter, setRatingFilter] = useState(['all'])
+    const [categoryFilter, setCategoryFilter] = useState(() => {
+      const genre = searchParams.get("genre")
+      return genre ? [genre] : ['all']
+    })
     const {addToWishlist} = useContext(WishlistContext)
     const { searchTerm } = useContext(SearchContext)
-    const [selectedGenre, setSelectedGenre] = useState('')
+
+    useEffect(() => {
+      const genre = searchParams.get("genre")
+      setCategoryFilter(genre ? [genre] : ['all'])
+    }, [searchParams])
 
     const filtered = data?.filter((b) => {
   const matchesSearch =
     b.bookAuthor.toLowerCase().includes(searchTerm.toLowerCase()) ||
     b.bookName.toLowerCase().includes(searchTerm.toLowerCase());
 
-  const matchesGenre = selectedGenre
-    ? Array.isArray(b.bookGenre)
-      ? b.bookGenre.map(g => g.toLowerCase()).includes(selectedGenre.toLowerCase())
-      : b.bookGenre.toLowerCase().split(",").map(g => g.trim()).includes(selectedGenre.toLowerCase())
-    : true;
+  const bookGenres = Array.isArray(b.bookGenre)
+    ? b.bookGenre.map(g => g.toLowerCase())
+    : b.bookGenre.toLowerCase().split(",").map(g => g.trim());
+
+  const matchesCategory = categoryFilter.includes('all') ? true : categoryFilter.some(
+    (category) => bookGenres.includes(category.toLowerCase())
+  );
 
   const matchesRating = ratingFilter.includes('all') ? true : (
     (ratingFilter.includes('above9') && b.bookRating > 9) ||
@@ -48,11 +61,14 @@ const Dashboard = () => {
     (ratingFilter.includes('5AndBelow') && b.bookRating <= 5)
   );
 
-  return matchesSearch && matchesGenre && matchesRating;
+  return matchesSearch && matchesCategory && matchesRating;
 });
 
+  const isChipActive = (value) =>
+    value === "" ? categoryFilter.includes("all") : categoryFilter.includes(value);
+
   const handleGenreClick = (genre) => {
-        setSelectedGenre(genre)
+        setCategoryFilter(genre === "" ? ["all"] : [genre])
     }
 
     const sortedBooks = filtered? [...filtered].sort((a, b) => {
@@ -75,9 +91,22 @@ const Dashboard = () => {
       });
     };
 
+    const handleCategoryChange = (filter) => {
+      setCategoryFilter((prev) => {
+        if (filter === 'all') {
+          return ['all'];
+        }
+        if (prev.includes(filter)) {
+          const next = prev.filter(f => f !== filter);
+          return next.length === 0 ? ['all'] : next;
+        }
+        return [...prev.filter(f => f !== 'all'), filter];
+      });
+    };
+
     const clearFilters = () => {
       setPriceSort('none')
-      setSelectedGenre('')
+      setCategoryFilter(['all'])
       setRatingFilter(['all']);
     }
     return (
@@ -153,6 +182,28 @@ const Dashboard = () => {
                     5 and below
                   </label>
                 </div>
+
+                <div className="dashboard__filter-block">
+                  <span className="dashboard__filter-label">Category</span>
+                  <label className="dashboard__filter-option">
+                    <input
+                      type="checkbox"
+                      checked={categoryFilter.includes('all')}
+                      onChange={() => handleCategoryChange('all')}
+                    />
+                    All categories
+                  </label>
+                  {CATEGORIES.map(({ label, value }) => (
+                    <label key={value} className="dashboard__filter-option">
+                      <input
+                        type="checkbox"
+                        checked={categoryFilter.includes(value)}
+                        onChange={() => handleCategoryChange(value)}
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </div>
               </div>
             </aside>
 
@@ -168,7 +219,7 @@ const Dashboard = () => {
                       key={label}
                       type="button"
                       className={
-                        selectedGenre === value
+                        isChipActive(value)
                           ? "dashboard__chip dashboard__chip--active"
                           : "dashboard__chip"
                       }
@@ -202,17 +253,14 @@ const Dashboard = () => {
                           ) : null}
                           <p className="dashboard__card-price">Rs. {book.bookPrice}</p>
                           <div className="dashboard__card-actions">
-                            {inCart ? (
-                              <div className="dashboard__qty" aria-label="Quantity in cart">
-                                <button type="button" onClick={() => decreaseQuantity(book._id)} aria-label="Decrease quantity">−</button>
-                                <span>{inCart.quantity}</span>
-                                <button type="button" onClick={() => increaseQuantity(book._id)} aria-label="Increase quantity">+</button>
-                              </div>
-                            ) : (
-                              <button type="button" className="dashboard__btn dashboard__btn--primary" onClick={() => addToCart(book)}>
-                                Add to cart
-                              </button>
-                            )}
+                            <button
+                              type="button"
+                              className="dashboard__btn dashboard__btn--primary"
+                              onClick={() => addToCart(book)}
+                              disabled={Boolean(inCart)}
+                            >
+                              {inCart ? "In cart" : "Add to cart"}
+                            </button>
                             <button type="button" className="dashboard__btn dashboard__btn--secondary" onClick={() => addToWishlist(book)}>
                               Add to wishlist
                             </button>

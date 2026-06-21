@@ -28,7 +28,7 @@ const App = () => {
       if (response.ok) {
         setToken(data.token)
         toast.success("Login successful!")
-        navigate("/dashboard") 
+        navigate("/home") 
       } else {
         toast.error(data.error || "Invalid credentials")
       }

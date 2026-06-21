@@ -8,7 +8,7 @@ import SearchContext from "../contexts/SearchContext"
 const Wishlist = () => {
     const {searchTerm, setSearchTerm} = useContext(SearchContext)
     const {wishlistItem, removeFromWishlist, totalPriceWishlist} = useContext(WishlistContext)
-    const { addToCart } = useContext(CartContext)
+    const { addToCart, cartItem } = useContext(CartContext)
 
     const search = searchTerm?.toLowerCase() || ""
 
@@ -33,7 +33,9 @@ const Wishlist = () => {
 
         {filteredWishlist.length > 0 ? (
             <div className="wishlist__grid">
-            {filteredWishlist.map((b) => (
+            {filteredWishlist.map((b) => {
+                const inCart = cartItem.find((item) => item._id === b._id)
+                return (
                 <article key={b._id} className="wishlist__card">
                     <div className="wishlist__card-media">
                     <img src={b.bookImage} alt={b.bookName} />
@@ -44,12 +46,20 @@ const Wishlist = () => {
                     <p className="wishlist__card-rating">★ {b.bookRating}</p>
                     <p className="wishlist__card-price">Rs. {b.bookPrice}</p>
                     <div className="wishlist__card-actions">
-                    <button type="button" className="wishlist__btn wishlist__btn--primary" onClick={() => addToCart(b)}>Add to Cart</button>
+                    <button
+                      type="button"
+                      className="wishlist__btn wishlist__btn--primary"
+                      onClick={() => addToCart(b)}
+                      disabled={Boolean(inCart)}
+                    >
+                      {inCart ? "In cart" : "Add to Cart"}
+                    </button>
                     <button type="button" className="wishlist__btn wishlist__btn--outline" onClick={() => removeFromWishlist(b)}>Remove</button>
                     </div>
                     </div>
                 </article>
-            ))}
+                )
+            })}
             </div>
 
         ) : (<p className="wishlist__empty"> No items in wishlist.</p>)}

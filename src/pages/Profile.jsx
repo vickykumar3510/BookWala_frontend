@@ -1,4 +1,4 @@
-import HeaderNoSearchBar from "../components/HeadeNoSearchBar";
+import HeaderNoSearchBar from "../components/HeaderNoSearchBar";
 import Footer from "../components/Footer";
 import AddressContext from "../contexts/AddressContext";
 import { useContext, useState, useEffect } from "react";

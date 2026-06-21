@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom"
-import HeaderNoSearchBar from '../components/HeadeNoSearchBar'
+import HeaderNoSearchBar from '../components/HeaderNoSearchBar'
 import Footer from "../components/Footer"
 
 const Checkout = () => {

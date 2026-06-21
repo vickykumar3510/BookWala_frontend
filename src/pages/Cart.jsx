@@ -127,10 +127,31 @@ const Cart = () => {
 
         <section className="cart__summary">
           <h2 className="cart__summary-title">Cart Summary</h2>
-          <div className="cart__summary-stats">
-            <p className="cart__summary-line">Total Number of Books: {totalBooks}</p>
-            <p className="cart__summary-line">Total Price: Rs. {totalPriceCart}</p>
-          </div>
+
+          {cartItem.length > 0 ? (
+            <>
+              <div className="cart__summary-items">
+                {cartItem.map((b) => (
+                  <p key={b._id} className="cart__summary-line cart__summary-line--item">
+                    <span className="cart__summary-item-detail">
+                      {b.bookName} × {b.quantity} = Rs. {b.bookPrice * b.quantity}
+                    </span>
+                  </p>
+                ))}
+              </div>
+
+              <div className="cart__summary-totals">
+                <p className="cart__summary-line cart__summary-line--total">
+                  Total Books: <strong>{totalBooks}</strong>
+                </p>
+                <p className="cart__summary-line cart__summary-line--total">
+                  Total Price: <strong>Rs. {totalPriceCart}</strong>
+                </p>
+              </div>
+            </>
+          ) : (
+            <p className="cart__summary-empty">No items in cart.</p>
+          )}
 
           <label htmlFor="address" className="cart__label">Please select a delivery address:</label>
           <select

@@ -53,6 +53,8 @@
     width: auto;
     transform: none;
     align-items: stretch;
+    max-height: min(40vh, 12rem);
+    overflow: hidden;
   }
 
   .Toastify__toast-container--bottom-left,
