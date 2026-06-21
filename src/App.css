@@ -450,7 +450,7 @@
 .dashboard__grid {
   display: grid;
   --dashboard-card-w: 270px;
-  grid-template-columns: repeat(auto-fill, var(--dashboard-card-w));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--dashboard-card-w)), 1fr));
   gap: 1rem;
   align-items: start;
   justify-content: center;
@@ -741,7 +741,10 @@
 .site-header {
   margin-inline: calc(-1 * var(--page-gutter, 1.25rem));
   padding-inline: var(--page-gutter, 1.25rem);
+  width: auto;
+  max-width: 100vw;
   box-sizing: border-box;
+  overflow-x: clip;
   position: sticky;
   top: 0;
   z-index: 200;
@@ -780,6 +783,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
+  max-width: 100%;
+  min-width: 0;
   text-decoration: none;
   line-height: 1.2;
   color: inherit;
@@ -820,6 +825,7 @@
   letter-spacing: -0.03em;
   color: #f4f4f5;
   transition: color 0.15s ease;
+  white-space: nowrap;
 }
 
 .site-header__search-wrap {
@@ -864,6 +870,7 @@
   align-items: center;
   justify-content: flex-end;
   gap: 0.35rem;
+  min-width: 0;
 }
 
 .site-header__link {
@@ -947,23 +954,32 @@
 
 @media (max-width: 800px) {
   .site-header__inner:not(.site-header__inner--no-search) {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     grid-template-rows: auto auto;
   }
 
   .site-header__inner--no-search {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto;
     grid-template-rows: auto;
   }
 
   .site-header__inner:not(.site-header__inner--no-search) .site-header__brand {
     grid-column: 1;
     grid-row: 1;
+    min-width: 0;
+  }
+
+  .site-header__inner--no-search .site-header__brand {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
   }
 
   .site-header__nav {
     grid-column: 2;
     grid-row: 1;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .site-header__search-wrap {
@@ -976,19 +992,94 @@
   }
 }
 
-@media (max-width: 480px) {
-  .site-header__nav {
-    gap: 0.25rem;
+@media (max-width: 520px) {
+  .site-header__inner,
+  .site-header__inner--no-search {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    gap: 0.55rem;
+    padding: 0.55rem 0;
   }
 
-  .site-header__link {
-    padding: 0.4rem 0.45rem;
-    font-size: 0.8rem;
+  .site-header__inner--no-search {
+    grid-template-rows: auto auto;
+  }
+
+  .site-header__brand {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  .site-header__nav {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    max-width: 100%;
+    justify-content: flex-start;
+    gap: 0.35rem 0.4rem;
+  }
+
+  .site-header__inner--no-search .site-header__nav {
+    grid-row: 2;
+  }
+
+  .site-header__search-wrap {
+    grid-column: 1;
+    grid-row: 3;
+    width: 100%;
   }
 
   .site-header__logout {
-    padding: 0.4rem 0.55rem;
-    font-size: 0.8rem;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-header__nav {
+    gap: 0.25rem 0.35rem;
+  }
+
+  .site-header__link {
+    padding: 0.38rem 0.42rem;
+    font-size: 0.78rem;
+  }
+
+  .site-header__logout {
+    padding: 0.38rem 0.5rem;
+    font-size: 0.78rem;
+  }
+
+  .site-header__logo-mark {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .site-header__logo-text {
+    font-size: 1.05rem;
+  }
+
+  .site-header__search {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .site-header__logo-text {
+    font-size: 0.95rem;
+  }
+
+  .site-header__link {
+    padding: 0.35rem 0.38rem;
+    font-size: 0.75rem;
+  }
+
+  .site-header__badge {
+    min-width: 1.15rem;
+    height: 1.15rem;
+    font-size: 0.65rem;
+    padding: 0 0.25rem;
   }
 }
 
@@ -996,7 +1087,10 @@
   margin-top: auto;
   margin-inline: calc(-1 * var(--page-gutter, 1.25rem));
   padding: 1.1rem var(--page-gutter, 1.25rem) 1.35rem;
+  width: auto;
+  max-width: 100vw;
   box-sizing: border-box;
+  overflow-x: clip;
   border-top: 1px solid var(--chrome-border, rgba(255, 255, 255, 0.08));
   background: var(--chrome-bg, #1a1b22);
   box-shadow:
@@ -2612,7 +2706,7 @@
 
 .landing__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
   gap: 1.15rem;
 }
 
