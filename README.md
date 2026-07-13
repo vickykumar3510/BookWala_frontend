@@ -2,9 +2,21 @@
 
 A full‑stack book shopping application where users can create accounts, log in securely, search any book, read about the book, buy book and add book to the wishlist to buy later. Built with a React frontend, Express/Node backend, MongoDB databases.
 
+---
+
 ## Demo Link
 
 [Live Demo](https://bookwala-tool.vercel.app)
+
+---
+
+## Login
+
+> **Guest**
+> Username: `vicky@gmail.com`  <br>
+> Password: `vicky`
+
+---
 
 ## Quick Start
 
@@ -14,7 +26,10 @@ cd <BookWala_frontend>
 npm install
 npm run dev
 ```
+---
+
 ## Technologies
+
 - React JS
 - React Router
 - Node JS
@@ -23,10 +38,16 @@ npm run dev
 - JWT
 - bcryptjs
 
+---
+
 ## Demo Video
-Watch a walkthrough of all the major features of this app: [Google Drive Link](https://drive.google.com/file/d/1n6cYrjxoyaHD991tsR7Pbms8akUhiFUB/view?usp=sharing)
+
+Watch a walkthrough (2-3 minutes) of all the major features of this app: [Google Drive Link](https://drive.google.com/file/d/1n6cYrjxoyaHD991tsR7Pbms8akUhiFUB/view?usp=sharing)
+
+---
 
 ## Features
+
 **Login**
 - User login form with email and password fields
 - Incorrect password alerts shown
@@ -73,8 +94,9 @@ Watch a walkthrough of all the major features of this app: [Google Drive Link](h
 - Shows selected delivery address and book information
 - Cart is cleared once order is placed
 
-##API Reference
---
+---
+
+## API Reference
 
 **POST /api/auth/signup**<br>
 Register new user<br>
@@ -179,6 +201,9 @@ Sample Response:
 ```
 [{ _id, title, author, genre, status, createdAt, updatedAt }]
 ```
-##Contact 
---
+
+---
+
+## Contact 
+
 For bugs or feature requests, please reach out to vicky.kumar3510@gmail.com
