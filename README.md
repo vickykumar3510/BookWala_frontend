@@ -13,7 +13,7 @@ A full‑stack book shopping application where users can create accounts, log in
 ## Login
 
 > **Guest** <br>
-> Username: `vicky@gmail.com`  <br>
+> Email: `vicky@gmail.com`  <br>
 > Password: `vicky`
 
 ---
